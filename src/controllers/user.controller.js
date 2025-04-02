@@ -170,9 +170,41 @@ const reCreateAccessToken = asyncHandler(async (req, res) => {
 
 })
 
+const updateUser = asyncHandler(async (req, res) => {
+    const {
+        firstName,
+        lastName,
+        email
+    } = req.body
+
+    if ([firstName, lastName, email].some((value) => value.trim() === "")) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            firstName,
+            lastName,
+            email
+        },
+        {
+            new: true,
+            select: "-password -refreshToken -__v"
+        }
+    )
+
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
+
+    return res.status(200).json(new ApiResponse(200, user, "User updated successfully"))
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    reCreateAccessToken
+    reCreateAccessToken,
+    updateUser
 }
