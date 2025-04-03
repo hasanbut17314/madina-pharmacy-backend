@@ -237,4 +237,4 @@ export {
     removeItemFromCart,
     getUserCart,
     emptyCart
-};
+}

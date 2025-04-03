@@ -44,6 +44,10 @@ const orderSchema = new Schema({
     totalPrice: {
         type: String,
         required: true
+    },
+    assignedRider: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     }
 }, { timestamps: true })
 

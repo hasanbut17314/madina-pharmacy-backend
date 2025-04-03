@@ -42,7 +42,8 @@ const registerUser = asyncHandler(async (req, res) => {
         firstName,
         lastName,
         email,
-        password
+        password,
+        role: "user"
     })
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
@@ -87,7 +88,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
-    const updatedUser = await User.findById(user._id).select("-password -refreshToken -__v")
+    const loggedIn = await User.findById(user._id).select("-password -refreshToken -__v")
 
     return res
         .status(200)
@@ -96,7 +97,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { user: updatedUser, accessToken, refreshToken },
+                { user: loggedIn, accessToken, refreshToken },
                 "User logged in successfully"
             )
         )
@@ -201,10 +202,101 @@ const updateUser = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, user, "User updated successfully"))
 })
 
+const addUser = asyncHandler(async (req, res) => {
+    const {
+        firstName,
+        lastName,
+        email,
+        role,
+        password,
+        confirmPassword
+    } = req.body
+
+    if ([firstName, lastName, email, role, password, confirmPassword].some((value) => value.trim() === "")) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    if (password !== confirmPassword) {
+        throw new ApiError(400, "Passwords do not match")
+    }
+
+    const allowedRoles = ["admin", "user", "manager", "rider"]
+    if (!allowedRoles.includes(role)) {
+        throw new ApiError(400, "Invalid role")
+    }
+
+    const user = await User.create({
+        firstName,
+        lastName,
+        email,
+        role,
+        password
+    })
+
+    if (!user) {
+        throw new ApiError(500, "Failed to create user")
+    }
+
+    const newUser = {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role
+    }
+
+    return res.status(201).json(new ApiResponse(201, newUser, "User created successfully"))
+})
+
+const getAllUsers = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, search, role } = req.query
+
+    const query = {};
+
+    if (search) {
+        query.$or = [
+            { firstName: { $regex: search, $options: "i" } },
+            { lastName: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { role: { $regex: search, $options: "i" } },
+        ];
+    }
+
+    if (role) {
+        query.role = role;
+    }
+
+    const users = await User.find(query)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+
+    const totalUsers = await User.countDocuments(query)
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    users,
+                    pagination: {
+                        page,
+                        limit,
+                        total: totalUsers
+                    }
+                },
+                "Users fetched successfully"
+            )
+        )
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
     reCreateAccessToken,
-    updateUser
+    updateUser,
+    addUser,
+    getAllUsers
 }
