@@ -42,8 +42,7 @@ const orderSchema = new Schema({
         }
     }],
     totalPrice: {
-        type: String,
-        required: true
+        type: Number
     },
     assignedRider: {
         type: mongoose.Schema.Types.ObjectId,
