@@ -38,6 +38,12 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Passwords do not match")
     }
 
+    const existingUser = await User.findOne({ email })
+
+    if (existingUser) {
+        throw new ApiError(400, "User already exists")
+    }
+
     const user = await User.create({
         firstName,
         lastName,

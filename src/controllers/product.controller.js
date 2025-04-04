@@ -116,7 +116,6 @@ const getAllProducts = asyncHandler(async (req, res) => {
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
-            { category: { $regex: search, $options: "i" } },
         ];
     }
 
@@ -159,7 +158,6 @@ const getProductsForUser = asyncHandler(async (req, res) => {
     if (search) {
         query.$or = [
             { name: { $regex: search, $options: "i" } },
-            { category: { $regex: search, $options: "i" } },
         ];
     }
 
@@ -167,7 +165,7 @@ const getProductsForUser = asyncHandler(async (req, res) => {
         query.category = category;
     }
 
-    if (isFeatured && typeof isFeatured === "boolean") {
+    if (isFeatured) {
         query.isFeatured = isFeatured;
     }
 
