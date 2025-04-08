@@ -88,7 +88,7 @@ const getOrderById = asyncHandler(async (req, res) => {
 
     const order = await Order.findById(orderId)
         .populate("orderItems.prodId", "name image")
-        .populate("assignedRider", "name email");
+        .populate("assignedRider", "firstName lastName email");
 
     if (!order) {
         throw new ApiError(404, "Order not found");
@@ -159,9 +159,9 @@ const getAllOrders = asyncHandler(async (req, res) => {
     }
 
     const orders = await Order.find(query)
-        .populate("userId", "name email")
+        .populate("userId", "firstName lastName email")
         .populate("orderItems.prodId", "name image")
-        .populate("assignedRider", "name email")
+        .populate("assignedRider", "firstName lastName email")
         .sort({ createdAt: -1 })
         .skip((parseInt(page) - 1) * parseInt(limit))
         .limit(parseInt(limit));
@@ -200,7 +200,7 @@ const getRiderOrders = asyncHandler(async (req, res) => {
     }
 
     const orders = await Order.find(query)
-        .populate("userId", "name email")
+        .populate("userId", "firstName lastName email")
         .populate("orderItems.prodId", "name image")
         .sort({ createdAt: -1 })
         .skip((parseInt(page) - 1) * parseInt(limit))
@@ -260,7 +260,7 @@ const assignOrderToRider = asyncHandler(async (req, res) => {
             status: "Shipped"
         },
         { new: true }
-    ).populate("assignedRider", "name email");
+    ).populate("assignedRider", "firstName lastName email");
 
     return res.status(200).json(
         new ApiResponse(
