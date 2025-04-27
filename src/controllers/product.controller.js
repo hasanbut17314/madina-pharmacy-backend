@@ -47,8 +47,8 @@ const updateProduct = asyncHandler(async (req, res) => {
         isFeatured
     } = req.body
 
-    if ([name, price, quantity].some((value) => value.trim() === "")) {
-        throw new ApiError(400, "All required fields are not filled")
+    if ([name, price, quantity].some((value) => !value)) {
+        throw new ApiError(400, "name, price and quantity are required fields")
     }
 
     const product = await Product.findById(req.params.id)
