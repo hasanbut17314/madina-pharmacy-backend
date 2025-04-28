@@ -26,6 +26,13 @@ const userSchema = new Schema({
         default: "user",
         required: true
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verificationToken: {
+        type: String
+    },
     refreshToken: {
         type: String
     }
@@ -69,6 +76,18 @@ userSchema.methods.generateRefreshToken = function () {
         process.env.REFRESH_TOKEN_SECRET,
         {
             expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+}
+
+userSchema.methods.generateVerificationToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id
+        },
+        process.env.VERIFICATION_TOKEN_SECRET,
+        {
+            expiresIn: process.env.VERIFICATION_TOKEN_EXPIRY
         }
     )
 }
