@@ -47,7 +47,11 @@ const orderSchema = new Schema({
     assignedRider: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    feedback: {
+        type: String,
+        default: null
+    },
 }, { timestamps: true })
 
 orderSchema.pre("save", function (next) {

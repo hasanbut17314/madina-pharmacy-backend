@@ -373,6 +373,49 @@ const cancelOrder = asyncHandler(async (req, res) => {
     }
 });
 
+const addFeedback = asyncHandler(async (req, res) => {
+    const { orderId } = req.params;
+    const { feedback } = req.body;
+
+    if (!orderId || !feedback) {
+        throw new ApiError(400, "Order ID and feedback are required");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        throw new ApiError(400, "Invalid order ID format");
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+        throw new ApiError(404, "Order not found");
+    }
+
+    if (
+        order.userId.toString() !== req.user._id.toString() &&
+        req.user.role !== "admin"
+    ) {
+        throw new ApiError(403, "You don't have permission to add feedback to this order");
+    }
+
+    if (order.status !== "Delivered") {
+        throw new ApiError(400, "Feedback can only be added to delivered orders");
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+        orderId,
+        { feedback },
+        { new: true }
+    );
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            updatedOrder,
+            "Feedback added successfully"
+        )
+    );
+});
+
 export {
     createOrder,
     getOrderById,
@@ -381,5 +424,6 @@ export {
     getRiderOrders,
     assignOrderToRider,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    addFeedback
 }

@@ -7,7 +7,8 @@ import {
     getRiderOrders,
     assignOrderToRider,
     updateOrderStatus,
-    cancelOrder
+    cancelOrder,
+    addFeedback
 } from "../controllers/order.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
@@ -21,5 +22,6 @@ router.get("/getAllorders", auth.verifyJWT, auth.isManager, getAllOrders);
 router.post("/assign", auth.verifyJWT, auth.isManager, assignOrderToRider);
 router.get("/rider/getOrders", auth.verifyJWT, auth.isRider, getRiderOrders);
 router.put("/rider/:orderId/updateStatus", auth.verifyJWT, auth.isRider, updateOrderStatus);
+router.put("/addFeedback/:orderId", auth.verifyJWT, addFeedback);
 
 export default router;
