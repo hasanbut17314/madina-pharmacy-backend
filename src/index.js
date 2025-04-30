@@ -21,4 +21,17 @@ app.get("/", (_, res) => {
     res.send("Hello World!");
 })
 
+// const createAdminUser = async () => {
+//     const adminUser = await User.create({
+//         firstName: "Admin",
+//         lastName: "User",
+//         email: "admin@mail.com",
+//         password: "admin123",
+//         role: "admin",
+//         isVerified: true
+//     })
+//     console.log("Admin user created: ", adminUser);
+
+// }
+
 app.use(errorHandler)
