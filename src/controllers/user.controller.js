@@ -142,13 +142,13 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     if (!user.isVerified) {
-        throw new ApiError(401, "Please verify your email to login")
+        throw new ApiError(403, "Please verify your email to login")
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(password)
 
     if (!isPasswordCorrect) {
-        throw new ApiError(401, "Invalid credentials")
+        throw new ApiError(403, "Invalid credentials")
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
