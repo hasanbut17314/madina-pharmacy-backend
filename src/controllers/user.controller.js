@@ -329,6 +329,9 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
     if (role) {
         query.role = role;
+        if (role === "rider") {
+            query.isActive = true;
+        }
     }
 
     const users = await User.find(query)

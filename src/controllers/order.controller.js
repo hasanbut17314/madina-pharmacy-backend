@@ -262,6 +262,9 @@ const assignOrderToRider = asyncHandler(async (req, res) => {
         { new: true }
     ).populate("assignedRider", "firstName lastName email");
 
+    rider.isActive = false;
+    await rider.save();
+
     return res.status(200).json(
         new ApiResponse(
             200,
@@ -308,6 +311,10 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         { status },
         { new: true }
     );
+
+    const rider = await User.findById(order.assignedRider);
+    rider.isActive = true;
+    await rider.save();
 
     return res.status(200).json(
         new ApiResponse(
