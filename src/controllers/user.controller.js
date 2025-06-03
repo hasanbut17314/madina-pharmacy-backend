@@ -272,16 +272,11 @@ const addUser = asyncHandler(async (req, res) => {
         lastName,
         email,
         role,
-        password,
-        confirmPassword
+        password
     } = req.body
 
-    if ([firstName, lastName, email, role, password, confirmPassword].some((value) => value.trim() === "")) {
+    if ([firstName, lastName, email, role, password].some((value) => !value)) {
         throw new ApiError(400, "All fields are required")
-    }
-
-    if (password !== confirmPassword) {
-        throw new ApiError(400, "Passwords do not match")
     }
 
     const allowedRoles = ["admin", "user", "manager", "rider"]
