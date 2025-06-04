@@ -266,6 +266,43 @@ const updateUser = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, user, "User updated successfully"))
 })
 
+const updateByAdmin = asyncHandler(async (req, res) => {
+    const { userId } = req.params
+
+    if (!userId) {
+        throw new ApiError(400, "User ID is required")
+    }
+
+    const { firstName, lastName, role, isActive } = req.body
+    if ([firstName, lastName, role].some((value) => !value)) {
+        throw new ApiError(400, "First name, last name and role are required")
+    }
+
+    const allowedRoles = ["admin", "user", "manager", "rider"]
+    if (!allowedRoles.includes(role)) {
+        throw new ApiError(400, "Invalid role")
+    }
+    const user = await User.findByIdAndUpdate(
+        userId,
+        {
+            firstName,
+            lastName,
+            role,
+            isActive: isActive !== undefined ? isActive : true
+        },
+        {
+            new: true,
+            select: "-password -refreshToken -__v"
+        }
+    )
+
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
+
+    return res.status(200).json(new ApiResponse(200, user, "User updated successfully"))
+})
+
 const addUser = asyncHandler(async (req, res) => {
     const {
         firstName,
@@ -362,5 +399,6 @@ export {
     reCreateAccessToken,
     updateUser,
     addUser,
-    getAllUsers
+    getAllUsers,
+    updateByAdmin
 }
